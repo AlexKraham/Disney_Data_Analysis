@@ -1,4 +1,4 @@
-let dataset, svg, genreData
+let dataset, svg, genreData, areaData
 let salarySizeScale, salaryXScale, categoryColorScale
 let simulation, nodes
 let categoryLegend, salaryLegend
@@ -129,6 +129,23 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
     genreData.sort((a,b) => (a.income > b.income) ? -1 : 1)
     console.log("genre data", genreData);
 
+    areaData = d3.nest().key(function(d) { return d3.timeYear(d.date)}).rollup(function(d) {return d3.sum(d, g => g.totalGross)}).entries(dataset);
+    // console.log("NESTED", nested);
+    // dataset.sort((a, b) => (a.date > b.date) ? -1 : -1)
+    // debugger;
+
+    // areaData.map(function(d) {
+    //     var strDate = d.key.replace(" 00:00:00 GMT-0800 (Pacific Standard Time)", "");
+    //     var date = d3.timeParse("%a %b %d %Y")
+    //     return date;
+    // })
+    
+    areaData.sort((a,b) => (new Date(a.key) < new Date(b.key)) ? -1 : 1)
+
+    areaData.map(d => d.key = new Date(d.key))
+
+    console.log("AREA DATA", areaData);
+
     // dataset = data;
     createScales()
     setTimeout(drawInitial(), 2000)
@@ -150,9 +167,13 @@ function createScales(){
 
     // grossIncYScale = d3.scaleLinear(d3.extent(dataset, d=> d.totalGross), [height / 2, margin.top + 50])
     grossIncYScale = d3.scaleLinear().domain([0, d3.max(dataset, function(d) { return d.totalGross})]).range([margin.top + height, margin.top])
+    // yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value)]).range([margin.top + height, margin.top])
     // grossIncYScale = d3.scaleLinear().domain(d3.extent(dataset, d => d.totalGross)).range([height, 0]);
-    timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([margin.left, margin.left + width])
+    // timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([margin.left, margin.left + width])
     // timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([0, width])
+    xAreaScale = d3.scaleTime().domain(d3.extent(areaData, d => d.key)).range([margin.left, margin.left + width])
+
+    yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value)]).range([margin.top + height, margin.top])
 
     // xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
     // yGenreScale = d3.scaleBand().range([margin.top, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
@@ -255,7 +276,7 @@ function drawInitial(){
 
 
     
-    let xTimeAxis = d3.axisBottom(timeXScale);
+    let xTimeAxis = d3.axisBottom(xAreaScale);
 
     let xTimeAxisGroup = svg.append('g')
         .call(xTimeAxis)
@@ -271,7 +292,7 @@ function drawInitial(){
     //             // let scatteryAxis = d3.axisLeft(salaryYScale).tickSize([width])
 
 
-    let yIncAxis = d3.axisLeft(grossIncYScale).tickSize([width]).tickFormat(function(d){ return '$' + d3.format(',')(d)})
+    let yIncAxis = d3.axisLeft(yAreaScale).tickSize([width]).tickFormat(function(d){ return '$' + d3.format(',')(d)})
             
     let yIncAxisGroup = svg.append('g')
         .call(yIncAxis)
@@ -283,14 +304,25 @@ function drawInitial(){
         .call(g => g.selectAll('.tick line'))
             .attr('stroke-opacity', 0.2)
             .attr('stroke-dasharray', 2.5)
+            
     
-    // const lineGenerator = d3.line()
-    //                         .x(d => timeXScale(d.date))    
-    //                         .y(d => grossIncYScale(d.totalGross))    
 
-    // svg.append('g').append("path")
-    //     .attr('class', 'line-path')
-    //     .attr('d', lineGenerator(dataset))
+
+    let dateSortedData = [...dataset];
+    console.log("date", dateSortedData)
+    dateSortedData.sort((a,b) => a.date > b.date ? 1: -1)
+    console.log("srted", dateSortedData);
+    const lineGenerator = d3.line()
+                            .x(d => xAreaScale(d.key))    
+                            .y(d => yAreaScale(d.value))    
+
+    svg.append('g').append("path")
+        .attr('class', 'line-path')
+        .attr("stroke", "steelblue")
+        .attr('fill', 'none')
+        .attr('opacity', 0)
+        .attr('d', lineGenerator(areaData))
+    
     // var area = d3.area()
     //                 .x(function(d) { return timeXScale(d.date)})       
     //                 .y0(margin.top + height)
@@ -359,7 +391,7 @@ function drawInitial(){
             .style('display', 'inline-block')
             .html(`<strong>Movie:</strong> ${d.title} 
                 <br> <strong>Gross Income:</strong> $${d3.format(",.2r")(d.totalGross)} 
-                <br> <strong>Adjusted Gross Income:</strong> ${d3.format(",.2r")(d.adjGross)}
+                <br> <strong>Adjusted Gross Income:</strong> $${d3.format(",.2r")(d.adjGross)}
                 <br> <strong>Release Date:</strong> ${d.releaseDate}
                 <br> <strong>Genre:</strong> ${d.genre}
                 <br> <strong>Rating:</strong> ${d.rating}`)
@@ -564,6 +596,7 @@ function clean(chartType){
     if (chartType !== "isArea"){
         svg.select('.area-x').transition().attr('opacity', 0)
         svg.select('.area-y').transition().attr('opacity', 0)
+        svg.select('.line-path').transition().attr('opacity', 0)
     }
     if(chartType !== "isBarChart"){
         console.log("Is this cleaning")
@@ -653,6 +686,7 @@ function draw3(){
         .attr('cx', margin.left + width)
         .attr('cy', height /2)
 
+    svg.select('.line-path').transition().duration(1400).attr('opacity', 1);
     svg.select('.area-x').transition().duration(1400).attr('opacity', 1);
     svg.select('.area-y').transition().duration(1400).attr('opacity', 1);
 
