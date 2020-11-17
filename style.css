@@ -22,6 +22,16 @@ body {
     font-family: 'DM Serif Display', serif;
 }
 
+.genre-chart-y{
+    font-size: 14px;
+    font-family: 'Libre Franklin', serif;
+}
+
+.genre-chart-x{
+    font-size: 10px;
+    font-family: 'Libre Franklin', serif;
+}
+
 .step {
     margin-bottom: 100px;
     height: 700px;

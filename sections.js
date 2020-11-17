@@ -485,9 +485,10 @@ function drawInitial(){
     // ============================= VISUALIZATION 4 : BAR CHARTS ============================= //
 
     xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
-    yGenreScale = d3.scaleBand().range([margin.top, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
+    yGenreScale = d3.scaleBand().range([margin.top + 200, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
 
-    let xGenreAxis = d3.axisBottom(xGenreScale);
+    let xGenreAxis = d3.axisBottom(xGenreScale).tickSize(-height+ 200).tickFormat(function(d){ return "$" + d/1000000000 + " Billion"});
+    // .tickFormat(function(d){ return '$' + d3.format(',')(d)})
 
     let xGenreAxisG = svg.append('g')
         .attr('class', 'genre-chart-x')
@@ -495,6 +496,9 @@ function drawInitial(){
         .attr('opacity', 0)
         .call(xGenreAxis)
         .call(g => g.select('.domain').remove())
+        .call(g => g.selectAll('.tick line'))
+            .attr('stroke-opacity', 0.2)
+            .attr('stroke-dasharray', 2.5)
     
     let yGenreAxis = d3.axisLeft(yGenreScale)
 
@@ -503,6 +507,10 @@ function drawInitial(){
         .attr('opacity', 0)
         .attr('transform', `translate(${margin.left}, 0)`)
         .call(yGenreAxis)
+        .call(g => g.select('.domain').remove())
+        .call(g => g.selectAll('.tick line'))
+            .attr('stroke-opacity', 0.2)
+            .attr('stroke-dasharray', 2.5)
 
 
     svg.selectAll('myRect')
