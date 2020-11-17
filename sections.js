@@ -485,14 +485,14 @@ function drawInitial(){
     // ============================= VISUALIZATION 4 : BAR CHARTS ============================= //
 
     xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
-    yGenreScale = d3.scaleBand().range([margin.top + 200, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
+    yGenreScale = d3.scaleBand().range([margin.top + 250, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
 
-    let xGenreAxis = d3.axisBottom(xGenreScale).tickSize(-height+ 200).tickFormat(function(d){ return "$" + d/1000000000 + " Billion"});
+    let xGenreAxis = d3.axisBottom(xGenreScale).tickSize(-height + 250).tickFormat(function(d){ return "$" + d/1000000000 + " Billion"});
     // .tickFormat(function(d){ return '$' + d3.format(',')(d)})
 
     let xGenreAxisG = svg.append('g')
         .attr('class', 'genre-chart-x')
-        .attr('transform', `translate(0, ${height + margin.top})`)
+        .attr('transform', `translate(0, ${height + margin.top - 100})`)
         .attr('opacity', 0)
         .call(xGenreAxis)
         .call(g => g.select('.domain').remove())
@@ -505,7 +505,7 @@ function drawInitial(){
     let yGenreAxisG = svg.append('g')    
         .attr('class', 'genre-chart-y')
         .attr('opacity', 0)
-        .attr('transform', `translate(${margin.left}, 0)`)
+        .attr('transform', `translate(${margin.left}, -100)`)
         .call(yGenreAxis)
         .call(g => g.select('.domain').remove())
         .call(g => g.selectAll('.tick line'))
@@ -522,7 +522,7 @@ function drawInitial(){
         .attr("x", xGenreScale(0))
         .attr("y", function(d){
             console.log("doing", d.genre)
-            return yGenreScale(d.genre);
+            return yGenreScale(d.genre) - 100;
         })
         .attr("width", function(d){
             // console.log("wow", yGenreScale(100000));
