@@ -129,16 +129,120 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
     genreData.sort((a,b) => (a.income > b.income) ? -1 : 1)
     console.log("genre data", genreData);
 
-    areaData = d3.nest().key(function(d) { return d3.timeYear(d.date)}).rollup(function(d) {return d3.sum(d, g => g.totalGross)}).entries(dataset);
-    // console.log("NESTED", nested);
-    // dataset.sort((a, b) => (a.date > b.date) ? -1 : -1)
-    // debugger;
-
-    // areaData.map(function(d) {
-    //     var strDate = d.key.replace(" 00:00:00 GMT-0800 (Pacific Standard Time)", "");
-    //     var date = d3.timeParse("%a %b %d %Y")
-    //     return date;
-    // })
+    areaData = d3
+                .nest()
+                .key(function(d) { return d3.timeYear(d.date)})
+                .rollup(function(d) {
+                    return {
+                        totalGross: d3.sum(d, g => g.totalGross),
+                        musicalIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Musical" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Musical" ? g.adjGross : 0;
+                            })
+                        },
+                        adventureIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Adventure" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Adventure" ? g.adjGross : 0;
+                            })
+                        },
+                        dramaIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Drama" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Drama" ? g.adjGross : 0;
+                            })
+                        },
+                        comedyIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Comedy" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Comedy" ? g.adjGross : 0;
+                            })
+                        },
+                        actionIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Action" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Action" ? g.adjGross : 0;
+                            })
+                        },
+                        horrorIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Horror" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Horror" ? g.adjGross : 0;
+                            })
+                        },
+                        romComIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Romantic Comedy" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Romantic Comedy" ? g.adjGross : 0;
+                            })
+                        },
+                        thrillSusIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Thriller/Suspense" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Thriller/Suspense" ? g.adjGross : 0;
+                            })
+                        },
+                        westernIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Western" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Western" ? g.adjGross : 0;
+                            })
+                        },
+                        blackComIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Black Comedy" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Black Comedy" ? g.adjGross : 0;
+                            })
+                        },
+                        concertPerfIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Concert/Performance" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Concert/Performance" ? g.adjGross : 0;
+                            })
+                        },
+                        docIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "Documentary" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "Documentary" ? g.adjGross : 0;
+                            })
+                        },
+                        missIncome: {
+                            totalGross: d3.sum(d, function(g){
+                                return g.genre == "" ? g.totalGross : 0;
+                            }),
+                            adjGross: d3.sum(d, function(g){
+                                return g.genre == "" ? g.adjGross : 0;
+                            })
+                        },
+                        adjGross: d3.sum(d, g => g.adjGross)
+                    }
+                })
+                .entries(dataset);
     
     areaData.sort((a,b) => (new Date(a.key) < new Date(b.key)) ? -1 : 1)
 
@@ -173,7 +277,9 @@ function createScales(){
     // timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([0, width])
     xAreaScale = d3.scaleTime().domain(d3.extent(areaData, d => d.key)).range([margin.left, margin.left + width])
 
-    yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value)]).range([margin.top + height, margin.top])
+    yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value.totalGross)]).range([margin.top + height /2, margin.top])
+
+    yAreaAdjScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value.adjGross)]).range([margin.top + height / 2, margin.top])
 
     // xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
     // yGenreScale = d3.scaleBand().range([margin.top, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
@@ -274,70 +380,6 @@ function drawInitial(){
             .attr('stroke-opacity', 0.2)
             .attr('stroke-dasharray', 2.5)
 
-
-    
-    let xTimeAxis = d3.axisBottom(xAreaScale);
-
-    let xTimeAxisGroup = svg.append('g')
-        .call(xTimeAxis)
-        .attr('class', 'area-x')
-        .attr('opacity', 0)
-        .attr('transform', `translate(0, ${margin.top + height})`)
-        .call(g => g.select('.domain')
-            .remove())
-        .call(g => g.selectAll('.tick line'))
-            .attr('stroke-opacity', 1)
-            .attr('stroke-dasharray', 2.5)
-
-    //             // let scatteryAxis = d3.axisLeft(salaryYScale).tickSize([width])
-
-
-    let yIncAxis = d3.axisLeft(yAreaScale).tickSize([width]).tickFormat(function(d){ return '$' + d3.format(',')(d)})
-            
-    let yIncAxisGroup = svg.append('g')
-        .call(yIncAxis)
-        .attr('class', 'area-y')
-        .attr('opacity', 0)
-        .attr('transform', `translate(${margin.left + width}, 0)`)
-        .call(g => g.select('.domain')
-            .remove())
-        .call(g => g.selectAll('.tick line'))
-            .attr('stroke-opacity', 0.2)
-            .attr('stroke-dasharray', 2.5)
-            
-    
-
-
-    let dateSortedData = [...dataset];
-    console.log("date", dateSortedData)
-    dateSortedData.sort((a,b) => a.date > b.date ? 1: -1)
-    console.log("srted", dateSortedData);
-    const lineGenerator = d3.line()
-                            .x(d => xAreaScale(d.key))    
-                            .y(d => yAreaScale(d.value))    
-
-    svg.append('g').append("path")
-        .attr('class', 'line-path')
-        .attr("stroke", "steelblue")
-        .attr('fill', 'none')
-        .attr('opacity', 0)
-        .attr('d', lineGenerator(areaData))
-    
-    // var area = d3.area()
-    //                 .x(function(d) { return timeXScale(d.date)})       
-    //                 .y0(margin.top + height)
-    //                 .y1(function(d) { return grossIncYScale(d.totalGross)})
-
-    // svg.append("path")
-    //     .datum(dataset)
-    //     .attr("fill", "#cce5df")
-    //     .attr("stroke", "#69b3a2")
-    //     .attr("stroke-width", 1.5)
-    //     .attr("d", area
-    //     )
-
-
-
     // Instantiates the force simulation
     // Has no forces. Actual forces are added and removed as required
 
@@ -374,12 +416,8 @@ function drawInitial(){
         .on('mouseout', mouseOut)
 
     function mouseOver(d, i){
-        // console.log("curr step", currentStep)
-        if(currentStep == 3 || currentStep == 4) return;
-
-
-        // console.log('hi')
-        d3.select(this)
+        if(currentStep == 0 || currentStep == 1 || currentStep == 2){
+            d3.select(this)
             .transition('mouseover').duration(100)
             .attr('opacity', 1)
             .attr('stroke-width', 5)
@@ -395,20 +433,24 @@ function drawInitial(){
                 <br> <strong>Release Date:</strong> ${d.releaseDate}
                 <br> <strong>Genre:</strong> ${d.genre}
                 <br> <strong>Rating:</strong> ${d.rating}`)
+        }
+        
     }
     
     function mouseOut(d, i){
-        if(currentStep == 3 || currentStep == 4) return;
+        if(currentStep == 0 || currentStep == 1 || currentStep == 2){
+            d3.select('#tooltip')
+                .style('display', 'none')
 
-        // console.log("current setp out", currentStep)
-        d3.select('#tooltip')
-            .style('display', 'none')
-
-        d3.select(this)
-            .transition('mouseout').duration(100)
-            .attr('opacity', 0.8)
-            .attr('stroke-width', 0)
+            d3.select(this)
+                .transition('mouseout').duration(100)
+                .attr('opacity', 0.8)
+                .attr('stroke-width', 0)
+        }
+        
     }
+
+    // ============================= VISUALIZATION SET UP FOR AREA CHARTS ============================= //
 
     //Small text label for first graph
     svg.selectAll('.small-text')
@@ -422,105 +464,91 @@ function drawInitial(){
             .attr('font-size', 7)
             .attr('text-anchor', 'end')
     
-    //All the required components for the small multiples charts
-    //Initialises the text and rectangles, and sets opacity to 0 
-    svg.selectAll('.cat-rect')
-        .data(categories).enter()
-        .append('rect')
-            .attr('class', 'cat-rect')
-            .attr('x', d => categoriesXY[d][0] + 120 + 1000)
-            .attr('y', d => categoriesXY[d][1] + 30)
-            .attr('width', 160)
-            .attr('height', 30)
-            .attr('opacity', 0)
-            .attr('fill', 'grey')
+
+            let xTimeAxis = d3.axisBottom(xAreaScale);
+
+            let xTimeAxisGroup = svg.append('g')
+                .call(xTimeAxis)
+                .attr('class', 'area-x')
+                .attr('opacity', 0)
+                .attr('transform', `translate(0, ${margin.top + 700})`)
+                .call(g => g.select('.domain')
+                    .remove())
+                .call(g => g.selectAll('.tick line'))
+                    .attr('stroke-opacity', 1)
+                    .attr('stroke-dasharray', 1.5)
+        
+        
+            let yIncAxis = d3.axisLeft(yAreaAdjScale).ticks(5).tickSize([width]).tickFormat(function(d){ return "$" + d/1000000000 + " billion"})
+                    
+            let yIncAxisGroup = svg.append('g')
+                .call(yIncAxis)
+                .attr('class', 'area-y')
+                .attr('opacity', 0)
+                .attr('transform', `translate(${margin.left + width}, 275)`)
+                .call(g => g.select('.domain')
+                    .remove())
+                .call(g => g.selectAll('.tick line'))
+                    .attr('stroke-opacity', 0.2)
+                    .attr('stroke-dasharray', 2.5)
+                    
+            
+            const areaGenerator = d3.area()
+                                    .x(d => xAreaScale(d.key))  
+                                    .y0(yAreaAdjScale(0))  
+                                    .y1(d => yAreaAdjScale(d.value.totalGross))    
+                                    .curve(d3.curveBasis)
+        
+            svg.append('g').append("path")
+                .attr('class', 'area-path')
+                .attr('transform', `translate(0, 275)`)
+                // .attr("stroke", "steelblue")
+                .attr("fill", "#cce5df")
+                .attr("stroke", "#69b3a2")
+                .attr("stroke-width", 1.5)
+                .attr('opacity', 0)
+                .attr('d', areaGenerator(areaData))
+    
 
 
-    svg.selectAll('.lab-text')
-        .data(categories).enter()
-        .append('text')
-        .attr('class', 'lab-text')
+    // ============================= VISUALIZATION 4 : AREA ADJ GROSS CHART ============================= //
+
+    let yAdjIncAxis = d3.axisLeft(yAreaAdjScale).ticks(5).tickSize([width]).tickFormat(function(d){ return "$" + d/1000000000 + " billion"})
+            
+    let yAdjIncAxisGroup = svg.append('g')
+        .call(yAdjIncAxis)
+        .attr('class', 'adj-area-y')
         .attr('opacity', 0)
-        .raise()
+        .attr('transform', `translate(${margin.left + width}, 275)`)
+        .call(g => g.select('.domain')
+            .remove())
+        .call(g => g.selectAll('.tick line'))
+            .attr('stroke-opacity', 0.2)
+            .attr('stroke-dasharray', 2.5)
+            
 
-    svg.selectAll('.lab-text')
-        .text(d => `Average: $${d3.format(",.2r")(categoriesXY[d][2])}`)
-        .attr('x', d => categoriesXY[d][0] + 200 + 1000)
-        .attr('y', d => categoriesXY[d][1] - 500)
-        .attr('font-family', 'Domine')
-        .attr('font-size', '12px')
-        .attr('font-weight', 700)
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')       
+    const adjAreaGenerator = d3.area()
+                            .x(d => xAreaScale(d.key))  
+                            .y0(yAreaAdjScale(0))  
+                            .y1(d => yAreaAdjScale(d.value.adjGross))    
+                            .curve(d3.curveBasis)
 
-    svg.selectAll('.lab-text')
-            .on('mouseover', function(d, i){
-                d3.select(this)
-                    .text(d)
-            })
-            .on('mouseout', function(d, i){
-                d3.select(this)
-                    .text(d => `Average: $${d3.format(",.2r")(categoriesXY[d][2])}`)
-            })
+    svg.append('g').append("path")
+        .attr('class', 'adj-area-path')
+        .attr('transform', `translate(0, 275)`)
+        // .attr("stroke", "steelblue")
+        .attr("fill", "#f0dfb4")
+        .attr("stroke", "#d1b05a")
+        .attr("stroke-width", 1.5)
+        .attr('opacity', 0)
+        .attr('d', adjAreaGenerator(areaData))
 
-
-    // Best fit line for gender scatter plot
-
-    const bestFitLine = [{x: 0, y: 56093}, {x: 1, y: 25423}]
-    // const lineFunction = d3.line()
-    //                         .x(d => shareWomenXScale(d.x))
-    //                         .y(d => salaryYScale(d.y))
-
-    // Axes for Scatter Plot
-    // svg.append('path')
-    //     .transition('best-fit-line').duration(430)
-    //         .attr('class', 'best-fit')
-    //         .attr('d', lineFunction(bestFitLine))
-    //         .attr('stroke', 'grey')
-    //         .attr('stroke-dasharray', 6.2)
-    //         .attr('opacity', 0)
-    //         .attr('stroke-width', 3)
-
-    // let scatterxAxis = d3.axisBottom(shareWomenXScale)
-    // let scatteryAxis = d3.axisLeft(salaryYScale).tickSize([width])
-
-    // svg.append('g')
-    //     .call(scatterxAxis)
-    //     .attr('class', 'scatter-x')
-    //     .attr('opacity', 0)
-    //     .attr('transform', `translate(0, ${height + margin.top})`)
-    //     .call(g => g.select('.domain')
-    //         .remove())
-    
-    
-    // svg.append('g')
-    //     .call(scatteryAxis)
-    //     .attr('class', 'scatter-y')
-    //     .attr('opacity', 0)
-    //     .attr('transform', `translate(${margin.left - 20 + width}, 0)`)
-    //     .call(g => g.select('.domain')
-    //         .remove())
-    //     .call(g => g.selectAll('.tick line'))
-    //         .attr('stroke-opacity', 0.2)
-    //         .attr('stroke-dasharray', 2.5)
-
-    // Axes for Histogram 
-
-    // let histxAxis = d3.axisBottom(enrollmentScale)
-
-    // svg.append('g')
-    //     .attr('class', 'enrolment-axis')
-    //     .attr('transform', 'translate(0, 700)')
-    //     .attr('opacity', 0)
-    //     .call(histxAxis)
-
-    // ============================= VISUALIZATION 4 : BAR CHARTS ============================= //
+    // ============================= VISUALIZATION 5 : BAR CHARTS ============================= //
 
     xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
     yGenreScale = d3.scaleBand().range([margin.top + 250, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
 
-    let xGenreAxis = d3.axisBottom(xGenreScale).tickSize(-height + 250).tickFormat(function(d){ return "$" + d/1000000000 + " Billion"});
-    // .tickFormat(function(d){ return '$' + d3.format(',')(d)})
+    let xGenreAxis = d3.axisBottom(xGenreScale).tickSize(-height + 250).tickFormat(function(d){ return "$" + d/1000000000 + " billion"});
 
     let xGenreAxisG = svg.append('g')
         .attr('class', 'genre-chart-x')
@@ -553,7 +581,7 @@ function drawInitial(){
         .attr('opacity', 0)
         .attr("x", xGenreScale(0))
         .attr("y", function(d){
-            console.log("doing", d.genre)
+            // console.log("doing", d.genre)
             return yGenreScale(d.genre) - 100;
         })
         .attr("width", function(d){
@@ -596,10 +624,14 @@ function clean(chartType){
     if (chartType !== "isArea"){
         svg.select('.area-x').transition().attr('opacity', 0)
         svg.select('.area-y').transition().attr('opacity', 0)
-        svg.select('.line-path').transition().attr('opacity', 0)
+        svg.select('.area-path').transition().attr('opacity', 0)
+    }
+    if (chartType !== "isAdjArea"){
+        svg.select('.area-x').transition().attr('opacity', 0)
+        svg.select('.adj-area-y').transition().attr('opacity', 0)
+        svg.select('.adj-area-path').transition().attr('opacity', 0)
     }
     if(chartType !== "isBarChart"){
-        console.log("Is this cleaning")
         svg.select('.genre-chart-x').transition().attr('opacity', 0)
         svg.select('.genre-chart-y').transition().attr('opacity', 0)
         svg.selectAll('.genre-rects').transition().attr('opacity', 0).attr("width", function(d){
@@ -657,7 +689,7 @@ function draw2(){
     simulation  
         .force('charge', d3.forceManyBody().strength([2]))
         .force('forceX', d3.forceX(function(d) {
-            console.log(d.genre);
+            // console.log(d.genre);
             return categoriesXY[d.genre][0] + 200
         } ))
         .force('forceY', d3.forceY(d => categoriesXY[d.genre][1] - 50))
@@ -672,13 +704,8 @@ function draw2(){
 
 function draw3(){
     currentStep = 3;
-    console.log("DRWING 3");
     let svg = d3.select("#vis").select('svg')
     clean('isArea')
-
-    svg.select('genre-chart-x').transition().attr('opacity', 0)
-        svg.select('genre-chart-y').transition().attr('opacity', 0)
-        svg.selectAll('genre-rects').transition().attr('opacity', 0)
     
     svg.selectAll('circle')
         .transition().duration(100).delay((d, i) => i * 2)
@@ -686,34 +713,54 @@ function draw3(){
         .attr('cx', margin.left + width)
         .attr('cy', height /2)
 
-    svg.select('.line-path').transition().duration(1400).attr('opacity', 1);
+    svg.select('.area-path').transition().duration(1400).attr('opacity', .7);
     svg.select('.area-x').transition().duration(1400).attr('opacity', 1);
     svg.select('.area-y').transition().duration(1400).attr('opacity', 1);
 
 
-    // var areaX = d3.scaleTime().domain(d3.extent(dataset, function(d) {
-    //     return d['release_date']
-    // })).range([0, width]);
+}
 
-    // svg.append("g").attr("transform", "translate(0," + height + ")")
-    //     .call(d3.axisBottom(x));
+function draw4(){
+    clean('isAdjArea');
 
+    currentStep = 4;
 
+    console.log("drawing 4");
+    let svg = d3.select('#vis').select('svg')
 
-        
-        // .attr('r', d => salarySizeScale(d.Median) * 1.2)
-        // .attr('fill', d => categoryColorScale(d.Category))
+    svg.select('.adj-area-path').transition().duration(700).attr('opacity', .7);
+    svg.select('.area-x').transition().duration(700).attr('opacity', 1);
+    svg.select('.adj-area-y').transition().duration(700).attr('opacity', 1);
 
-    // svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
-    //     .attr('opacity', 0.2)
-    //     .attr('x', d => categoriesXY[d][0] + 120)
-        
+}
+
+function draw5(){
+
+    clean("isStackedAreaChart")
+    currentStep = 5;
+    let svg = d3.select('#vis').select('svg')
+
+    svg.select('.adj-area-path').transition().duration(700).attr('opacity', .5);
+    svg.select('.area-path').transition().duration(700).attr('opacity', 1);
+    svg.select('.area-x').transition().duration(700).attr('opacity', 1);
+    svg.select('.adj-area-y').transition().duration(700).attr('opacity', 1);
+    
+    // let svg = d3.select('#vis').select('svg')
+    // clean('isMultiples')
+
+    // simulation
+    //     .force('forceX', d3.forceX(d => categoriesXY[d.Category][0] + 200))
+    //     .force('forceY', d3.forceY(d => categoriesXY[d.Category][1] - 50))
+    //     .force('collide', d3.forceCollide(d => salarySizeScale(d.Median) + 4))
+
+    // simulation.alpha(1).restart()
+   
     // svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
-    //     .text(d => `Average: $${d3.format(",.2r")(categoriesXY[d][2])}`)
+    //     .text(d => `% Female: ${(categoriesXY[d][3])}%`)
     //     .attr('x', d => categoriesXY[d][0] + 200)   
     //     .attr('y', d => categoriesXY[d][1] + 50)
     //     .attr('opacity', 1)
-
+    
     // svg.selectAll('.lab-text')
     //     .on('mouseover', function(d, i){
     //         d3.select(this)
@@ -721,129 +768,17 @@ function draw3(){
     //     })
     //     .on('mouseout', function(d, i){
     //         d3.select(this)
-    //             .text(d => `Average: $${d3.format(",.2r")(categoriesXY[d][2])}`)
+    //             .text(d => `% Female: ${(categoriesXY[d][3])}%`)
     //     })
-
-    // simulation  
-    //     .force('charge', d3.forceManyBody().strength([2]))
-    //     .force('forceX', d3.forceX(d => categoriesXY[d.Category][0] + 200))
-    //     .force('forceY', d3.forceY(d => categoriesXY[d.Category][1] - 50))
-    //     .force('collide', d3.forceCollide(d => salarySizeScale(d.Median) + 4))
-    //     .alpha(0.7).alphaDecay(0.02).restart()
-
-}
-
-function draw4(){
-
-    // currentStep = 4;
-    // console.log("DRWING 4");
-    // let svg = d3.select("#vis").select('svg')
-    // clean('isBarChart')
-    
-    // svg.selectAll('circle')
-    //     .transition().duration(100).delay((d, i) => i * 2)
-    //     .attr("opacity", 0)
-    //     .attr('cx', margin.left + width)
-    //     .attr('cy', height /2)
-
-    // svg.select('.area-x').transition().duration(1400).attr('opacity', 1);
-    // svg.select('.area-y').transition().duration(1400).attr('opacity', 1);
-
-
-    currentStep = 4;
-    clean('isBarChart')
-    console.log("drawing 4");
-    let svg = d3.select('#vis').select('svg')
-
-    svg.select('.genre-chart-x').transition().duration(1400).attr('opacity', 1);
-    svg.select('.genre-chart-y').transition().duration(1400).attr('opacity', 1);
-    svg.selectAll('.genre-rects')
-        .transition()
-        .duration(1400)
-        .attr("width", d => xGenreScale(d.income))
-        .attr('x', d=> xGenreScale(0) )
-        .attr('opacity', 1)
-        .delay(function(d,i) {
-        return(i * 100)
-    })
-    // svg.selectAll('circle')
-    //     .transition().duration(100).delay((d, i) => i * 5)
-    //     .attr("opacity", 1);
-
-    //     svg.selectAll('circle')
-    //     .transition().duration(300).delay((d, i) => i * 3)
-    //     .attr('r', d => grossIncSizeScale(d.totalGross) * 1.2)
-    //     .attr('fill', d => categoryColorScale(d.genre))
-    //     .attr('opacity', 1)
-
-    // simulation  
-    //     .force('charge', d3.forceManyBody().strength([2]))
-    //     .force('forceX', d3.forceX(function(d) {
-    //         console.log("CHANGIN")
-    //         console.log(d.genre);
-    //         return categoriesXY[d.genre][0] + 200
-    //     } ))
-    //     .force('forceY', d3.forceY(d => categoriesXY[d.genre][1] - 50))
-    //     .force('collide', d3.forceCollide(d => grossIncSizeScale(d.totalGross) + 4))
-    //     .alphaDecay([0.02])
-
-    
-
-    // simulation.stop()
-
-    // svg.selectAll('circle')
-    //     .transition().duration(600).delay((d, i) => i * 2).ease(d3.easeBack)
-    //         .attr('r', 10)
-    //         .attr('cx', d => histXScale(d.Midpoint))
-    //         .attr('cy', d => histYScale(d.HistCol))
-    //         .attr('fill', d => categoryColorScale(d.Category))
-
-    // let xAxis = d3.axisBottom(histXScale)
-    // svg.append('g')
-    //     .attr('class', 'hist-axis')
-    //     .attr('transform', `translate(0, ${height + margin.top + 10})`)
-    //     .call(xAxis)
-
-    // svg.selectAll('.lab-text')
-    //     .on('mouseout', )
-}
-
-function draw5(){
-    
-    let svg = d3.select('#vis').select('svg')
-    clean('isMultiples')
-
-    simulation
-        .force('forceX', d3.forceX(d => categoriesXY[d.Category][0] + 200))
-        .force('forceY', d3.forceY(d => categoriesXY[d.Category][1] - 50))
-        .force('collide', d3.forceCollide(d => salarySizeScale(d.Median) + 4))
-
-    simulation.alpha(1).restart()
    
-    svg.selectAll('.lab-text').transition().duration(300).delay((d, i) => i * 30)
-        .text(d => `% Female: ${(categoriesXY[d][3])}%`)
-        .attr('x', d => categoriesXY[d][0] + 200)   
-        .attr('y', d => categoriesXY[d][1] + 50)
-        .attr('opacity', 1)
-    
-    svg.selectAll('.lab-text')
-        .on('mouseover', function(d, i){
-            d3.select(this)
-                .text(d)
-        })
-        .on('mouseout', function(d, i){
-            d3.select(this)
-                .text(d => `% Female: ${(categoriesXY[d][3])}%`)
-        })
-   
-    svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
-        .attr('opacity', 0.2)
-        .attr('x', d => categoriesXY[d][0] + 120)
+    // svg.selectAll('.cat-rect').transition().duration(300).delay((d, i) => i * 30)
+    //     .attr('opacity', 0.2)
+    //     .attr('x', d => categoriesXY[d][0] + 120)
 
-    svg.selectAll('circle')
-        .transition().duration(400).delay((d, i) => i * 4)
-            .attr('fill', colorByGender)
-            .attr('r', d => salarySizeScale(d.Median))
+    // svg.selectAll('circle')
+    //     .transition().duration(400).delay((d, i) => i * 4)
+    //         .attr('fill', colorByGender)
+    //         .attr('r', d => salarySizeScale(d.Median))
 
 }
 
@@ -858,65 +793,90 @@ function colorByGender(d, i){
 }
 
 function draw6(){
-    simulation.stop()
+    clean("isGenreLineChart")
+    currentStep = 6;
     
-    let svg = d3.select("#vis").select("svg")
-    clean('isScatter')
-
-    svg.selectAll('.scatter-x').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
-    svg.selectAll('.scatter-y').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
-
-    svg.selectAll('circle')
-        .transition().duration(800).ease(d3.easeBack)
-        .attr('cx', d => shareWomenXScale(d.ShareWomen))
-        .attr('cy', d => salaryYScale(d.Median))
+    // simulation.stop()
     
-    svg.selectAll('circle').transition(1600)
-        .attr('fill', colorByGender)
-        .attr('r', 10)
+    // let svg = d3.select("#vis").select("svg")
+    // clean('isScatter')
 
-    svg.select('.best-fit').transition().duration(300)
-        .attr('opacity', 0.5)
+    // svg.selectAll('.scatter-x').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
+    // svg.selectAll('.scatter-y').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)
+
+    // svg.selectAll('circle')
+    //     .transition().duration(800).ease(d3.easeBack)
+    //     .attr('cx', d => shareWomenXScale(d.ShareWomen))
+    //     .attr('cy', d => salaryYScale(d.Median))
+    
+    // svg.selectAll('circle').transition(1600)
+    //     .attr('fill', colorByGender)
+    //     .attr('r', 10)
+
+    // svg.select('.best-fit').transition().duration(300)
+    //     .attr('opacity', 0.5)
    
 }
 
 function draw7(){
     let svg = d3.select('#vis').select('svg')
+    currentStep = 7;
+    console.log("drawing 7");
 
-    clean('isBubble')
+    clean('isBarChart')
 
-    simulation
-        .force('forceX', d3.forceX(d => enrollmentScale(d.Total)))
-        .force('forceY', d3.forceY(500))
-        .force('collide', d3.forceCollide(d => enrollmentSizeScale(d.Total) + 2))
-        .alpha(0.8).alphaDecay(0.05).restart()
 
-    svg.selectAll('circle')
-        .transition().duration(300).delay((d, i) => i * 4)
-        .attr('r', d => enrollmentSizeScale(d.Total))
-        .attr('fill', d => categoryColorScale(d.Category))
+    svg.select('.genre-chart-x').transition().duration(1400).attr('opacity', 1);
+    svg.select('.genre-chart-y').transition().duration(1400).attr('opacity', 1);
+    svg.selectAll('.genre-rects')
+        .transition()
+        .duration(1400)
+        .attr("width", d => xGenreScale(d.income))
+        .attr('x', d=> xGenreScale(0) )
+        .attr('opacity', 1)
+        .delay(function(d,i) {
+        return(i * 100)
+    })
 
-    //Show enrolment axis (remember to include domain)
-    svg.select('.enrolment-axis').attr('opacity', 0.5).selectAll('.domain').attr('opacity', 1)
+    // simulation
+    //     .force('forceX', d3.forceX(d => enrollmentScale(d.Total)))
+    //     .force('forceY', d3.forceY(500))
+    //     .force('collide', d3.forceCollide(d => enrollmentSizeScale(d.Total) + 2))
+    //     .alpha(0.8).alphaDecay(0.05).restart()
+
+    // svg.selectAll('circle')
+    //     .transition().duration(300).delay((d, i) => i * 4)
+    //     .attr('r', d => enrollmentSizeScale(d.Total))
+    //     .attr('fill', d => categoryColorScale(d.Category))
+
+    // //Show enrolment axis (remember to include domain)
+    // svg.select('.enrolment-axis').attr('opacity', 0.5).selectAll('.domain').attr('opacity', 1)
 
 }
 
 
 function draw8(){
     clean('none')
+    currentStep = 8;
+    console.log("drawing 8");
 
-    let svg = d3.select('#vis').select('svg')
-    svg.selectAll('circle')
-        .transition()
-        .attr('r', d => salarySizeScale(d.Median) * 1.6)
-        .attr('fill', d => categoryColorScale(d.Category))
+    // let svg = d3.select('#vis').select('svg')
+    // svg.selectAll('circle')
+    //     .transition()
+    //     .attr('r', d => salarySizeScale(d.Median) * 1.6)
+    //     .attr('fill', d => categoryColorScale(d.Category))
 
-    simulation 
-        .force('forceX', d3.forceX(500))
-        .force('forceY', d3.forceY(500))
-        .force('collide', d3.forceCollide(d => salarySizeScale(d.Median) * 1.6 + 4))
-        .alpha(0.6).alphaDecay(0.05).restart()
+    // simulation 
+    //     .force('forceX', d3.forceX(500))
+    //     .force('forceY', d3.forceY(500))
+    //     .force('collide', d3.forceCollide(d => salarySizeScale(d.Median) * 1.6 + 4))
+    //     .alpha(0.6).alphaDecay(0.05).restart()
         
+}
+
+function draw9(){
+    currentStep = 9;
+    console.log("drawing 9");
 }
 
 //Array of all the graph functions
@@ -930,7 +890,8 @@ let activationFunctions = [
     draw5, 
     draw6, 
     draw7,
-    draw8
+    draw8,
+    draw9
 ]
 
 //All the scrolling function

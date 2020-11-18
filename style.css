@@ -18,6 +18,11 @@ body {
     margin-right: 50px;
 }
 
+.area-path {
+    color: "#809cd9";
+    fill: "#809cd9";
+}
+
 .categoryLegend {
     font-family: 'DM Serif Display', serif;
 }
@@ -28,7 +33,22 @@ body {
 }
 
 .genre-chart-x{
-    font-size: 10px;
+    font-size: 14px;
+    font-family: 'Libre Franklin', serif;
+}
+
+.area-y {
+    font-size: 14px;
+    font-family: 'Libre Franklin', serif;
+}
+
+.adj-area-y {
+    font-size: 14px;
+    font-family: 'Libre Franklin', serif;
+}    
+
+.area-x {
+    font-size: 14px;
     font-family: 'Libre Franklin', serif;
 }
 
