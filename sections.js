@@ -757,7 +757,7 @@ function draw2(){
     clean('none')
 
     svg.selectAll('circle')
-        .transition().duration(300).delay((d, i) => i * 1)
+        .transition().duration(300).delay((d, i) => i * 5)
         .attr('r', d => grossIncSizeScale(d.totalGross) * 1.2)
         .attr('fill', d => categoryColorScale(d.genre))
         .attr('opacity', 1)

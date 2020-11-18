@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css?family=Domine:400,700&display=swap');
 /* @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text&display=swap'); */
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Serif+Text&family=Libre+Franklin:wght@100&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 body {
     background-color: rgb(245, 244, 241);
@@ -140,3 +141,4 @@ img {
     font-weight: 100;
     font-size: 12px;
 }
+
