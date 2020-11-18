@@ -28,7 +28,7 @@ body {
     font-family: 'DM Serif Display', serif;
 }
 
-.genre-chart-y, .genre-chart-x, .area-y, .adj-area-y, .area-x, .line-x, .line-y{
+.genre-chart-y, .genre-chart-x, .area-y, .adj-area-y, .area-x, .line-x, .line-y, .num-line-x, .num-line-y{
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
 }
