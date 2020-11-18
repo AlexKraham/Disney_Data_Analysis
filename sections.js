@@ -135,7 +135,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                 .rollup(function(d) {
                     return {
                         totalGross: d3.sum(d, g => g.totalGross),
-                        musicalIncome: {
+                        "Musical": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Musical" ? g.totalGross : 0;
                             }),
@@ -143,7 +143,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Musical" ? g.adjGross : 0;
                             })
                         },
-                        adventureIncome: {
+                        "Adventure": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Adventure" ? g.totalGross : 0;
                             }),
@@ -151,7 +151,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Adventure" ? g.adjGross : 0;
                             })
                         },
-                        dramaIncome: {
+                        "Drama": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Drama" ? g.totalGross : 0;
                             }),
@@ -159,7 +159,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Drama" ? g.adjGross : 0;
                             })
                         },
-                        comedyIncome: {
+                        "Comedy": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Comedy" ? g.totalGross : 0;
                             }),
@@ -167,7 +167,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Comedy" ? g.adjGross : 0;
                             })
                         },
-                        actionIncome: {
+                        "Action": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Action" ? g.totalGross : 0;
                             }),
@@ -175,7 +175,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Action" ? g.adjGross : 0;
                             })
                         },
-                        horrorIncome: {
+                        "Horror": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Horror" ? g.totalGross : 0;
                             }),
@@ -183,7 +183,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Horror" ? g.adjGross : 0;
                             })
                         },
-                        romComIncome: {
+                        "Romantic Comedy": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Romantic Comedy" ? g.totalGross : 0;
                             }),
@@ -191,7 +191,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Romantic Comedy" ? g.adjGross : 0;
                             })
                         },
-                        thrillSusIncome: {
+                        "Thriller/Suspense": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Thriller/Suspense" ? g.totalGross : 0;
                             }),
@@ -199,7 +199,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Thriller/Suspense" ? g.adjGross : 0;
                             })
                         },
-                        westernIncome: {
+                        "Western": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Western" ? g.totalGross : 0;
                             }),
@@ -207,7 +207,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Western" ? g.adjGross : 0;
                             })
                         },
-                        blackComIncome: {
+                        "Black Comedy": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Black Comedy" ? g.totalGross : 0;
                             }),
@@ -215,7 +215,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Black Comedy" ? g.adjGross : 0;
                             })
                         },
-                        concertPerfIncome: {
+                        "Concert/Performance": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Concert/Performance" ? g.totalGross : 0;
                             }),
@@ -223,7 +223,7 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Concert/Performance" ? g.adjGross : 0;
                             })
                         },
-                        docIncome: {
+                        "Documentary": {
                             totalGross: d3.sum(d, function(g){
                                 return g.genre == "Documentary" ? g.totalGross : 0;
                             }),
@@ -231,12 +231,13 @@ d3.csv('data/disney_movies_total_gross.csv', function(d){
                                 return g.genre == "Documentary" ? g.adjGross : 0;
                             })
                         },
-                        missIncome: {
+                        "Missing": {
                             totalGross: d3.sum(d, function(g){
-                                return g.genre == "" ? g.totalGross : 0;
+                                // console.log("G",g);
+                                return g.genre === "Missing" ? g.totalGross : 0;
                             }),
                             adjGross: d3.sum(d, function(g){
-                                return g.genre == "" ? g.adjGross : 0;
+                                return g.genre === "Missing" ? g.adjGross : 0;
                             })
                         },
                         adjGross: d3.sum(d, g => g.adjGross)
@@ -262,39 +263,22 @@ const colors = ['#ffcc00', '#ff6666', '#cc0066', '#66cccc', '#f688bb', '#65587f'
 //Create all the scales and save to global variables
 
 function createScales(){
-    // salarySizeScale = d3.scaleLinear(d3.extent(dataset, d => d.Median), [5, 35])
+
     grossIncSizeScale = d3.scaleLinear(d3.extent(dataset, d => d.totalGross), [5, 35])
-    // salaryXScale = d3.scaleLinear(d3.extent(dataset, d => d.Median), [margin.left, margin.left + width+250])
+
     grossIncXScale = d3.scaleLinear(d3.extent(dataset, d => d.totalGross), [margin.left, margin.left + width+ 550])
-    // salaryYScale = d3.scaleLinear([20000, 110000], [margin.top + height, margin.top])
+
     categoryColorScale = d3.scaleOrdinal(categories, colors)
 
-    // grossIncYScale = d3.scaleLinear(d3.extent(dataset, d=> d.totalGross), [height / 2, margin.top + 50])
+
     grossIncYScale = d3.scaleLinear().domain([0, d3.max(dataset, function(d) { return d.totalGross})]).range([margin.top + height, margin.top])
-    // yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value)]).range([margin.top + height, margin.top])
-    // grossIncYScale = d3.scaleLinear().domain(d3.extent(dataset, d => d.totalGross)).range([height, 0]);
-    // timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([margin.left, margin.left + width])
-    // timeXScale = d3.scaleTime().domain(d3.extent(dataset, d => d.date)).range([0, width])
+
     xAreaScale = d3.scaleTime().domain(d3.extent(areaData, d => d.key)).range([margin.left, margin.left + width])
 
     yAreaScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value.totalGross)]).range([margin.top + height /2, margin.top])
 
     yAreaAdjScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value.adjGross)]).range([margin.top + height / 2, margin.top])
 
-    // xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
-    // yGenreScale = d3.scaleBand().range([margin.top, margin.top + height]).domain(genreData.map(d=> d.genre)).padding(.1);
-
-
-    // var areaX = d3.scaleTime().domain(d3.extent(dataset, function(d) {
-    //     return d['release_date']
-    // })).range([0, width]);
-
-    // categoryColorScale = d3.scaleOrdinal(d3.schemeCategory20);
-    // shareWomenXScale = d3.scaleLinear(d3.extent(dataset, d => d.ShareWomen), [margin.left, margin.left + width])
-    // enrollmentScale = d3.scaleLinear(d3.extent(dataset, d => d.Total), [margin.left + 120, margin.left + width - 50])
-    // enrollmentSizeScale = d3.scaleLinear(d3.extent(dataset, d=> d.Total), [10,60])
-    // histXScale = d3.scaleLinear(d3.extent(dataset, d => d.Midpoint), [margin.left, margin.left + width])
-    // histYScale = d3.scaleLinear(d3.extent(dataset, d => d.HistCol), [margin.top + height, margin.top])
 }
 
 function createLegend(x, y){
@@ -543,6 +527,93 @@ function drawInitial(){
         .attr('opacity', 0)
         .attr('d', adjAreaGenerator(areaData))
 
+
+    // ============================= VISUALIZATION SET UP FOR LINE CHARTS ============================= //
+    var xLineScale = d3.scaleTime().domain(d3.extent(areaData, d => d.key)).range([margin.left, margin.left + width]);
+
+    var yLineScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value.adjGross)]).range([margin.top + height/2, margin.top]);
+
+    let xLineAxis = d3.axisBottom(xLineScale);
+    let yLineAxis = d3.axisLeft(yLineScale).tickSize([width]).tickFormat(function(d){ return "$" + d/1000000000 + " billion"})
+
+    let xLineAxisG = svg.append('g')
+                .call(xLineAxis)
+                .attr('class', 'line-x')
+                .attr('opacity', 0)
+                .attr('transform', `translate(0, ${margin.top + 700})`)
+                .call(g => g.select('.domain')
+                    .remove())
+                .call(g => g.selectAll('.tick line'))
+                    .attr('stroke-opacity', 1)
+                    .attr('stroke-dasharray', 1.5)
+
+    let yLineAxisG = svg.append('g')
+                .call(yLineAxis)
+                .attr('class', 'line-y')
+                .attr('opacity', 0)
+                .attr('transform', `translate(${margin.left + width}, 275)`)
+                .call(g => g.select('.domain')
+                    .remove())
+                .call(g => g.selectAll('.tick line'))
+                    .attr('stroke-opacity', 0.2)
+                    .attr('stroke-dasharray', 2.5)
+
+    const lineGenerator = d3.line()
+                    .x(d => xLineScale(d.key))  
+                    .y(d => yLineScale(d.value.Musical.adjGross))    
+                    .curve(d3.curveBasis)
+    
+    var genreLine = svg.append('g').append("path")
+        .attr('class', 'line-path')
+        .attr('transform', `translate(0, 275)`)
+        // .attr("stroke", "steelblue")
+        .attr("fill", "none")
+        .attr("stroke", "#ffcc00")
+        .attr("stroke-width", 1.5)
+        .attr('opacity', 0)
+        .attr('d', lineGenerator(areaData))
+
+    // CREATE THE SELECTION OPTIONS
+    d3.select("#selectButton")
+        .selectAll('myOptions')
+        .data(categories)
+        .enter()
+        .append('option')
+        .text(function (d) { return d;})
+        .attr("value", d => d);
+
+    function update(selectedGroup){
+        console.log("Updating", selectedGroup);
+        console.log("area data", areaData)
+        xLineScale = d3.scaleTime().domain(d3.extent(areaData, d => d.key)).range([margin.left, margin.left + width]);
+        yLineScale = d3.scaleLinear().domain([0, d3.max(areaData, d => d.value[selectedGroup].adjGross)]).range([margin.top + height/2, margin.top]);
+        xLineAxis = d3.axisBottom(xLineScale);
+        yLineAxis = d3.axisLeft(yLineScale).tickSize([width]).tickFormat(function(d){ return "$" + d/1000000000 + " billion"})
+
+        
+
+        xLineAxisG.transition().duration(1000).call(xLineAxis);
+
+        yLineAxisG.transition().duration(1000).call(yLineAxis);
+
+        genreLine
+            .datum(areaData)
+            .transition()
+            .duration(1000)
+            .attr("d", d3.line()
+                .x(d => xLineScale(d.key))
+                .y(d => yLineScale(d.value[selectedGroup].adjGross))   
+                .curve(d3.curveBasis)
+            )
+            .attr("stroke", d => colors[genreMap[selectedGroup]])
+    }
+
+    d3.select("#selectButton")
+        .on("change", function(d){
+            var selectedOption = d3.select(this).property("value")
+            update(selectedOption)
+        })
+
     // ============================= VISUALIZATION 5 : BAR CHARTS ============================= //
 
     xGenreScale = d3.scaleLinear().domain(d3.extent(genreData, d => d.income)).range([margin.left, margin.left + width])
@@ -637,6 +708,11 @@ function clean(chartType){
         svg.selectAll('.genre-rects').transition().attr('opacity', 0).attr("width", function(d){
             return xGenreScale(0)
         })
+    }
+    if(chartType !== 'isGenreLineChart'){
+        svg.select('.line-x').transition().attr('opacity', 0)
+        svg.select('.line-y').transition().attr('opacity', 0)
+        svg.select('.line-path').transition().attr('opacity', 0)
     }
 }
 
@@ -798,7 +874,14 @@ function draw6(){
     
     // simulation.stop()
     
-    // let svg = d3.select("#vis").select("svg")
+    let svg = d3.select("#vis").select("svg")
+
+    // svg.select('.adj-area-path').transition().duration(700).attr('opacity', .5);
+    // svg.select('.area-path').transition().duration(700).attr('opacity', 1);
+    svg.select('.line-x').transition().duration(700).attr('opacity', 1);
+    svg.select('.line-y').transition().duration(700).attr('opacity', 1);
+    svg.select('.line-path').transition().duration(700).attr('opacity', 1);
+
     // clean('isScatter')
 
     // svg.selectAll('.scatter-x').transition().attr('opacity', 0.7).selectAll('.domain').attr('opacity', 1)

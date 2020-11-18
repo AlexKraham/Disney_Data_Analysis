@@ -27,12 +27,12 @@ body {
     font-family: 'DM Serif Display', serif;
 }
 
-.genre-chart-y{
+.genre-chart-y, .genre-chart-x, .area-y, .adj-area-y, .area-x, .line-x, .line-y{
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
 }
 
-.genre-chart-x{
+/* .genre-chart-x{
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
 }
@@ -40,17 +40,17 @@ body {
 .area-y {
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
-}
+} */
 
-.adj-area-y {
+/* .adj-area-y {
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
-}    
+}     */
 
-.area-x {
+/* .area-x {
     font-size: 14px;
     font-family: 'Libre Franklin', serif;
-}
+} */
 
 .step {
     margin-bottom: 100px;
